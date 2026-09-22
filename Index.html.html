@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Binance 7币实时监控 V6.6-1</title>
+
+<style>
+:root{
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --text:#17202a;
+  --muted:#7b8794;
+  --line:#e8edf2;
+  --soft:#f0f3f6;
+  --green:#16a34a;
+  --red:#dc2626;
+  --orange:#f59e0b;
+  --blue:#2563eb;
+  --shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",
+  "PingFang SC","Helvetica Neue",Arial,sans-serif;
+  font-size:13px;
+}
+
+button{
+  font:inherit;
+}
+
+.app{
+  width:100%;
+  max-width:760px;
+  margin:0 auto;
+  padding-bottom:40px;
+}
+
+.top{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(245,247,250,.94);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  padding:12px 12px 8px;
+}
+
+.title-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.title{
+  font-size:20px;
+  font-weight:850;
+  letter-spacing:-.5px;
+}
+
+.version{
+  font-size:10px;
+  color:var(--muted);
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:4px 8px;
+}
+
+.sub{
+  margin-top:4px;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.conn{
+  margin-top:9px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.conn-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#aaa;
+}
+
+.conn-dot.ok{
+  background:var(--green);
+  box-shadow:0 0 0 3px rgba(22,163,74,.12);
+}
+
+.conn-dot.warn{
+  background:var(--orange);
+}
+
+.sec{
+  margin:9px 10px 0;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:15px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+
+.head{
+  padding:12px 12px 8px;
+  border-bottom:1px solid var(--line);
+}
+
+.st{
+  font-size:14px;
+  font-weight:800;
+}
+
+.sd{
+  margin-top:3px;
+  font-size:10px;
+  color:var(--muted);
+}
+
+.pad{
+  padding:10px;
+}
+
+/* 7币实时状态 */
+
+.live-table{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:11px;
+  overflow:hidden;
+}
+
+.live-row{
+  display:grid;
+  grid-template-columns:48px minmax(76px,1fr) 58px 58px 58px 48px;
+  align-items:center;
+  min-height:42px;
+  padding:0 7px;
+  border-bottom:1px solid var(--line);
+  column-gap:3px;
+  font-size:10px;
+}
+
+.live-row:last-child{
+  border-bottom:none;
+}
+
+.live-row span{
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.live-head{
+  min-height:31px;
+  background:var(--soft);
+  color:var(--muted);
+  font-size:9px;
+}
+
+.live-row:not(.live-head) span:nth-child(1){
+  font-weight:850;
+  color:var(--text);
+}
+
+.live-row:not(.live-head) span:nth-child(2){
+  font-weight:750;
+  font-variant-numeric:tabular-nums;
+}
+
+.live-up{
+  color:var(--green);
+  font-weight:750;
+}
+
+.live-down{
+  color:var(--red);
+  font-weight:750;
+}
+
+.live-flat{
+  color:var(--muted);
+}
+
+.live-vol{
+  font-weight:750;
+}
+
+.live-hot{
+  color:var(--red);
+}
+
+.live-warm{
+  color:var(--orange);
+}
+
+.live-dot{
+  font-size:8px;
+  font-weight:800;
+}
+
+.live-on{
+  color:var(--green);
+}
+
+.live-off{
+  color:#999;
+}
+
+/* 异常雷达 */
+
+.radar-item{
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:10px;
+  margin-bottom:7px;
+}
+
+.radar-item:last-child{
+  margin-bottom:0;
+}
+
+.radar-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.radar-name{
+  font-weight:850;
+}
+
+.radar-type{
+  font-size:10px;
+  font-weight:800;
+}
+
+.radar-data{
+  margin-top:6px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.radar-empty{
+  color:var(--muted);
+  text-align:center;
+  padding:12px 4px;
+  font-size:11px;
+}
+
+/* 日趋势 */
+
+.daily-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.daily-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:9px 10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+
+.daily-name{
+  font-weight:800;
+}
+
+.daily-value{
+  font-weight:800;
+}
+
+/* 币种卡片 */
+
+.coin-card{
+  border-top:1px solid var(--line);
+}
+
+.coin-card:first-child{
+  border-top:none;
+}
+
+.coin-head{
+  padding:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.coin-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.coin-name{
+  font-size:16px;
+  font-weight:900;
+}
+
+.live-badge{
+  font-size:8px;
+  font-weight:800;
+  color:var(--green);
+  background:rgba(22,163,74,.09);
+  border-radius:10px;
+  padding:3px 6px;
+}
+
+.coin-price{
+  font-size:18px;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+
+.coin-main{
+  padding:0 12px 11px;
+}
+
+.coin-stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+}
+
+.stat{
+  background:var(--soft);
+  border-radius:9px;
+  padding:7px 6px;
+  min-width:0;
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:9px;
+}
+
+.stat-value{
+  margin-top:3px;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.chart-wrap{
+  margin-top:9px;
+  height:145px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+  background:#fff;
+}
+
+.chart-tabs{
+  display:flex;
+  gap:5px;
+  padding:7px 10px;
+  border-top:1px solid var(--line);
+}
+
+.chart-tab{
+  border:1px solid var(--line);
+  background:var(--soft);
+  color:var(--muted);
+  border-radius:8px;
+  padding:5px 10px;
+  font-size:10px;
+}
+
+.chart-tab.active{
+  color:var(--text);
+  background:#fff;
+  font-weight:800;
+}
+
+canvas{
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+.footer{
+  text-align:center;
+  color:#9aa3ad;
+  font-size:9px;
+  padding:15px;
+}
+
+@media(max-width:390px){
+  .live-row{
+    grid-template-columns:43px minmax(67px,1fr) 53px 53px 53px 43px;
+    padding:0 5px;
+    font-size:9px;
+  }
+
+  .live-head{
+    font-size:8px;
+  }
+
+  .coin-stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="top">
+    <div class="title-row">
+      <div class="title">₿ Binance 7币监控</div>
+      <div class="version">V6.6-1</div>
+    </div>
+
+    <div class="sub">
+      实时价格 · 5M · 1H · 24H · 异常放量
+    </div>
+
+    <div class="conn">
+      <span id="connDot" class="conn-dot"></span>
+      <span id="connText">正在连接 Binance...</span>
+    </div>
+  </div>
+
+
+  <!-- 7币实时状态 -->
+
+  <section class="sec">
+
+    <div class="head">
+      <div class="st">🌐 7币实时状态</div>
+      <div class="sd">实时价格 · 24H · 5M · 相对量能</div>
+    </div>
+
+    <div class="pad">
+
+      <div class="live-table">
+
+        <div class="live-row live-head">
+          <span>币种</span>
+          <span>实时价格</span>
+          <span>24H</span>
+          <span>5M</span>
+          <span>量能</span>
+          <span>状态</span>
+        </div>
+
+        <div id="liveRows"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- 异常雷达 -->
+
+  <section class="sec">
+
+    <div class="head">
+      <div class="st">🚨 市场异常雷达</div>
+      <div class="sd">快速上涨 · 快速下跌 · 异常放量 · 1H异动</div>
+    </div>
+
+    <div class="pad">
+      <div id="radar"></div>
+    </div>
+
+  </section>
+
+
+  <!-- 日趋势 -->
+
+  <section class="sec">
+
+    <div class="head">
+      <div class="st">📊 市场日趋势</div>
+      <div class="sd">7个监控币种24小时整体状态</div>
+    </div>
+
+    <div class="pad">
+      <div id="daily"></div>
+    </div>
+
+  </section>
+
+
+  <!-- 币种详细卡片 -->
+
+  <section class="sec">
+
+    <div class="head">
+      <div class="st">🪙 币种详细监控</div>
+      <div class="sd">5分钟 / 1小时K线 + 24小时数据</div>
+    </div>
+
+    <div id="cards"></div>
+
+  </section>
+
+
+  <div class="footer">
+    Binance Market Monitor · V6.6-1
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   Binance 7币监控
+   稳定连接架构：
+   REST + 每币独立 WebSocket
+   ========================= */
+
+const API = "https://api.binance.com";
+
+const COINS = [
+  "BTCUSDT",
+  "ETHUSDT",
+  "BNBUSDT",
+  "SOLUSDT",
+  "XRPUSDT",
+  "DOGEUSDT",
+  "SHIBUSDT"
+];
+
+const S = {};
+
+COINS.forEach(x => {
+
+  S[x] = {
+    price:null,
+    p24:null,
+    hi:null,
+    lo:null,
+    v24:null,
+    k5:[],
+    k1:[],
+    v5:null,
+    vr:null,
+    live:false,
+    int:"5m"
+  };
+
+});
+
+
+/* =========================
+   工具函数
+   ========================= */
+
+function n(v){
+  const x = Number(v);
+  return Number.isFinite(x) ? x : null;
+}
+
+
+function P(v){
+
+  v = n(v);
+
+  if(v === null) return "--";
+
+  if(v >= 1000){
+    return v.toLocaleString("en-US",{
+      maximumFractionDigits:2
+    });
+  }
+
+  if(v >= 1){
+    return v.toFixed(2);
+  }
+
+  if(v >= 0.01){
+    return v.toFixed(4);
+  }
+
+  if(v >= 0.0001){
+    return v.toFixed(6);
+  }
+
+  return v.toPrecision(6);
+}
+
+
+function Q(v){
+
+  v = n(v);
+
+  if(v === null) return "--";
+
+  return (v >= 0 ? "+" : "") + v.toFixed(2) + "%";
+}
+
+
+function L(arr){
+
+  if(!arr || arr.length < 2){
+    return null;
+  }
+
+  const a = n(arr[0][1]);
+  const b = n(arr[arr.length-1][4]);
+
+  if(a === null || b === null || a === 0){
+    return null;
+  }
+
+  return (b / a - 1) * 100;
+}
+
+
+function volumeLevel(r){
+
+  if(r === null) return "";
+
+  if(r >= 5) return "极端放量";
+
+  if(r >= 3) return "异常放量";
+
+  if(r >= 2) return "明显放量";
+
+  if(r >= 1.5) return "量能放大";
+
+  return "正常";
+}
+
+
+/* =========================
+   24小时数据
+   ========================= */
+
+async function f24(){
+
+  try{
+
+    const r = await fetch(
+      API + "/api/v3/ticker/24hr",
+      {
+        cache:"no-store"
+      }
+    );
+
+    if(!r.ok){
+      throw new Error("24h HTTP " + r.status);
+    }
+
+    const a = await r.json();
+
+    const map = {};
+
+    a.forEach(o => {
+      if(COINS.includes(o.symbol)){
+        map[o.symbol] = o;
+      }
+    });
+
+    COINS.forEach(x => {
+
+      const o = map[x];
+
+      if(!o) return;
+
+      S[x].p24 = n(o.priceChangePercent);
+      S[x].hi  = n(o.highPrice);
+      S[x].lo  = n(o.lowPrice);
+      S[x].v24 = n(o.quoteVolume);
+
+      if(S[x].price === null){
+        S[x].price = n(o.lastPrice);
+      }
+
+    });
+
+    updateConnection();
+
+    render();
+
+  }catch(e){
+
+    console.log("24h error:",e);
+
+  }
+
+}
+
+
+/* =========================
+   K线
+   ========================= */
+
+async function fk(x, i){
+
+  try{
+
+    const r = await fetch(
+      API +
+      "/api/v3/klines?symbol=" +
+      x +
+      "&interval=" +
+      i +
+      "&limit=36",
+      {
+        cache:"no-store"
+      }
+    );
+
+    if(!r.ok){
+      throw new Error("Kline HTTP " + r.status);
+    }
+
+    const a = await r.json();
+
+    const data = a.map(k => [
+
+      Number(k[0]),
+      n(k[1]),
+      n(k[2]),
+      n(k[3]),
+      n(k[4]),
+      n(k[5]),
+      Number(k[6]),
+      n(k[7])
+
+    ]);
+
+    if(i === "5m"){
+      S[x].k5 = data;
+    }else{
+      S[x].k1 = data;
+    }
+
+    if(i === "5m"){
+      vr(x);
+    }
+
+  }catch(e){
+
+    console.log(x,i,"kline error:",e);
+
+  }
+
+}
+
+
+async function allk(){
+
+  await Promise.all(
+    COINS.flatMap(x => [
+      fk(x,"5m"),
+      fk(x,"1h")
+    ])
+  );
+
+  render();
+
+}
+
+
+/* =========================
+   相对量能
+   当前5M成交额 /
+   前19根平均成交额
+   ========================= */
+
+function vr(x){
+
+  const a = S[x].k5;
+
+  if(!a || a.length < 5){
+    S[x].vr = null;
+    return null;
+  }
+
+  const current = n(a[a.length-1][7]);
+
+  if(current === null){
+    S[x].vr = null;
+    return null;
+  }
+
+  const old = a.slice(
+    Math.max(0,a.length-20),
+    a.length-1
+  );
+
+  const vals = old
+    .map(k => n(k[7]))
+    .filter(v => v !== null && v > 0);
+
+  if(!vals.length){
+    S[x].vr = null;
+    return null;
+  }
+
+  const avg =
+    vals.reduce((a,b)=>a+b,0) / vals.length;
+
+  if(avg <= 0){
+    S[x].vr = null;
+    return null;
+  }
+
+  S[x].vr = current / avg;
+
+  return S[x].vr;
+}
+
+
+/* =========================
+   实时K线更新
+   ========================= */
+
+function liveCandle(x){
+
+  const s = S[x];
+
+  if(!s.k5 || !s.k5.length || s.price === null){
+    return;
+  }
+
+  const k = s.k5[s.k5.length-1];
+
+  const p = s.price;
+
+  k[4] = p;
+
+  if(k[2] === null || p > k[2]){
+    k[2] = p;
+  }
+
+  if(k[3] === null || p < k[3]){
+    k[3] = p;
+  }
+
+}
+
+
+/* =========================
+   异常判断
+   ========================= */
+
+function ev(x){
+
+  const s = S[x];
+
+  const result = [];
+
+  const p5 = L(s.k5);
+  const p1 = L(s.k1);
+  const r = s.vr;
+
+  if(p5 !== null){
+
+    if(p5 >= 1.5){
+      result.push({
+        type:"🚀 快速上涨",
+        cls:"live-up"
+      });
+    }
+
+    if(p5 <= -1.5){
+      result.push({
+        type:"🔻 快速下跌",
+        cls:"live-down"
+      });
+    }
+
+  }
+
+  if(r !== null && r >= 3){
+
+    if(p5 !== null && p5 > 0){
+
+      result.push({
+        type:"🔥 异常放量上涨",
+        cls:"live-up"
+      });
+
+    }else if(p5 !== null && p5 < 0){
+
+      result.push({
+        type:"🔥 异常放量下跌",
+        cls:"live-down"
+      });
+
+    }else{
+
+      result.push({
+        type:"🔥 异常放量",
+        cls:"live-hot"
+      });
+
+    }
+
+  }
+
+  if(p1 !== null){
+
+    if(p1 >= 4){
+
+      result.push({
+        type:"⚡ 1H强势",
+        cls:"live-up"
+      });
+
+    }
+
+    if(p1 <= -4){
+
+      result.push({
+        type:"⚡ 1H弱势",
+        cls:"live-down"
+      });
+
+    }
+
+  }
+
+  return result;
+
+}
+
+
+/* =========================
+   7币实时状态
+   ========================= */
+
+function marketOverview(){
+
+  const box = document.getElementById("liveRows");
+
+  if(!box) return;
+
+  let html = "";
+
+  COINS.forEach(x => {
+
+    const s = S[x];
+
+    const price =
+      s.price !== null
+      ? P(s.price)
+      : "--";
+
+    const p24 =
+      s.p24 !== null
+      ? Q(s.p24)
+      : "--";
+
+    const p5 =
+      s.k5 && s.k5.length
+      ? Q(L(s.k5))
+      : "--";
+
+    const vr =
+      s.vr !== null
+      ? s.vr.toFixed(2) + "×"
+      : "--";
+
+
+    const c24 =
+      s.p24 > 0
+      ? "live-up"
+      : s.p24 < 0
+        ? "live-down"
+        : "live-flat";
+
+
+    const p5v = L(s.k5);
+
+    const c5 =
+      p5v > 0
+      ? "live-up"
+      : p5v < 0
+        ? "live-down"
+        : "live-flat";
+
+
+    let volClass = "live-vol";
+    let volIcon = "—";
+
+    if(s.vr >= 5){
+
+      volClass += " live-hot";
+      volIcon = "🔥";
+
+    }else if(s.vr >= 3){
+
+      volClass += " live-hot";
+      volIcon = "🔥";
+
+    }else if(s.vr >= 1.5){
+
+      volClass += " live-warm";
+      volIcon = "⚡";
+
+    }
+
+
+    const status =
+      s.live
+      ? `<span class="live-dot live-on">● LIVE</span>`
+      : `<span class="live-dot live-off">○ REST</span>`;
+
+
+    html += `
+      <div class="live-row">
+
+        <span>
+          ${x.replace("USDT","")}
+        </span>
+
+        <span>
+          ${price}
+        </span>
+
+        <span class="${c24}">
+          ${p24}
+        </span>
+
+        <span class="${c5}">
+          ${p5}
+        </span>
+
+        <span class="${volClass}">
+          ${volIcon} ${vr}
+        </span>
+
+        ${status}
+
+      </div>
+    `;
+
+  });
+
+  box.innerHTML = html;
+
+}
+
+
+/* =========================
+   异常雷达
+   ========================= */
+
+function radar(){
+
+  const box = document.getElementById("radar");
+
+  if(!box) return;
+
+  let html = "";
+
+  COINS.forEach(x => {
+
+    const s = S[x];
+
+    const events = ev(x);
+
+    events.forEach(e => {
+
+      const p5 = L(s.k5);
+      const p1 = L(s.k1);
+
+      html += `
+        <div class="radar-item">
+
+          <div class="radar-top">
+
+            <span class="radar-name">
+              ${x.replace("USDT","")}
+            </span>
+
+            <span class="radar-type ${e.cls}">
+              ${e.type}
+            </span>
+
+          </div>
+
+          <div class="radar-data">
+
+            <span>5M ${p5 !== null ? Q(p5) : "--"}</span>
+
+            <span>1H ${p1 !== null ? Q(p1) : "--"}</span>
+
+            <span>
+              量能
+              ${s.vr !== null ? s.vr.toFixed(2)+"×" : "--"}
+            </span>
+
+            <span>
+              ${volumeLevel(s.vr)}
+            </span>
+
+          </div>
+
+        </div>
+      `;
+
+    });
+
+  });
+
+
+  if(!html){
+
+    html = `
+      <div class="radar-empty">
+        暂无明显异常，市场目前没有触发监控条件
+      </div>
+    `;
+
+  }
+
+  box.innerHTML = html;
+
+}
+
+
+/* =========================
+   日趋势
+   ========================= */
+
+function daily(){
+
+  const box = document.getElementById("daily");
+
+  if(!box) return;
+
+  const vals = COINS
+    .map(x => S[x].p24)
+    .filter(v => v !== null);
+
+  if(!vals.length){
+
+    box.innerHTML = `
+      <div class="radar-empty">
+        正在等待24小时数据...
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const avg =
+    vals.reduce((a,b)=>a+b,0) / vals.length;
+
+
+  let up = 0;
+  let down = 0;
+
+  vals.forEach(v => {
+
+    if(v > .15) up++;
+    else if(v < -.15) down++;
+
+  });
+
+
+  let marketText = "震荡";
+
+  if(avg >= 1){
+    marketText = "偏强";
+  }else if(avg <= -1){
+    marketText = "偏弱";
+  }
+
+
+  let strongest = null;
+  let weakest = null;
+
+  COINS.forEach(x => {
+
+    const v = S[x].p24;
+
+    if(v === null) return;
+
+    if(
+      strongest === null ||
+      v > S[strongest].p24
+    ){
+      strongest = x;
+    }
+
+    if(
+      weakest === null ||
+      v < S[weakest].p24
+    ){
+      weakest = x;
+    }
+
+  });
+
+
+  box.innerHTML = `
+    <div class="daily-wrap">
+
+      <div class="daily-row">
+        <span class="daily-name">
+          市场平均24H
+        </span>
+
+        <span class="daily-value ${
+          avg > 0
+          ? "live-up"
+          : avg < 0
+            ? "live-down"
+            : "live-flat"
+        }">
+          ${Q(avg)}
+        </span>
+      </div>
+
+
+      <div class="daily-row">
+        <span class="daily-name">
+          市场状态
+        </span>
+
+        <span class="daily-value">
+          ${marketText}
+        </span>
+      </div>
+
+
+      <div class="daily-row">
+        <span class="daily-name">
+          上涨 / 下跌
+        </span>
+
+        <span class="daily-value">
+          <span class="live-up">${up}</span>
+          /
+          <span class="live-down">${down}</span>
+        </span>
+      </div>
+
+
+      <div class="daily-row">
+        <span class="daily-name">
+          24H最高
+        </span>
+
+        <span class="daily-value">
+          ${
+            strongest
+            ? strongest.replace("USDT","") +
+              " " +
+              Q(S[strongest].p24)
+            : "--"
+          }
+        </span>
+      </div>
+
+
+      <div class="daily-row">
+        <span class="daily-name">
+          24H最低
+        </span>
+
+        <span class="daily-value">
+          ${
+            weakest
+            ? weakest.replace("USDT","") +
+              " " +
+              Q(S[weakest].p24)
+            : "--"
+          }
+        </span>
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+/* =========================
+   币种卡片
+   ========================= */
+
+function card(x){
+
+  const s = S[x];
+
+  const p5 = L(s.k5);
+  const p1 = L(s.k1);
+
+  return `
+    <div class="coin-card">
+
+      <div class="coin-head">
+
+        <div class="coin-left">
+
+          <div class="coin-name">
+            ${x.replace("USDT","")}
+          </div>
+
+          ${
+            s.live
+            ? `<span class="live-badge">● LIVE</span>`
+            : `<span class="live-badge" style="color:#999">○ REST</span>`
+          }
+
+        </div>
+
+        <div class="coin-price">
+          ${P(s.price)}
+        </div>
+
+      </div>
+
+
+      <div class="coin-main">
+
+        <div class="coin-stats">
+
+          <div class="stat">
+            <div class="stat-label">24H</div>
+            <div class="stat-value ${
+              s.p24 > 0
+              ? "live-up"
+              : s.p24 < 0
+                ? "live-down"
+                : ""
+            }">
+              ${Q(s.p24)}
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-label">5M</div>
+            <div class="stat-value ${
+              p5 > 0
+              ? "live-up"
+              : p5 < 0
+                ? "live-down"
+                : ""
+            }">
+              ${Q(p5)}
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-label">1H</div>
+            <div class="stat-value ${
+              p1 > 0
+              ? "live-up"
+              : p1 < 0
+                ? "live-down"
+                : ""
+            }">
+              ${Q(p1)}
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-label">相对量能</div>
+            <div class="stat-value ${
+              s.vr >= 3
+              ? "live-hot"
+              : s.vr >= 1.5
+                ? "live-warm"
+                : ""
+            }">
+              ${
+                s.vr !== null
+                ? s.vr.toFixed(2)+"×"
+                : "--"
+              }
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-label">24H最高</div>
+            <div class="stat-value">
+              ${P(s.hi)}
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-label">24H最低</div>
+            <div class="stat-value">
+              ${P(s.lo)}
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-label">24H成交额</div>
+            <div class="stat-value">
+              ${
+                s.v24 !== null
+                ? formatVolume(s.v24)
+                : "--"
+              }
+            </div>
+          </div>
+
+
+          <div class="stat">
+            <div class="stat-label">量能状态</div>
+            <div class="stat-value">
+              ${volumeLevel(s.vr) || "--"}
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="chart-wrap">
+          <canvas id="cv-${x}"></canvas>
+        </div>
+
+
+        <div class="chart-tabs">
+
+          <button
+            class="chart-tab ${s.int === "5m" ? "active" : ""}"
+            onclick="chg('${x}','5m')">
+            5M
+          </button>
+
+          <button
+            class="chart-tab ${s.int === "1h" ? "active" : ""}"
+            onclick="chg('${x}','1h')">
+            1H
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+function formatVolume(v){
+
+  v = n(v);
+
+  if(v === null) return "--";
+
+  if(v >= 1000000000){
+    return (v/1000000000).toFixed(2) + "B";
+  }
+
+  if(v >= 1000000){
+    return (v/1000000).toFixed(2) + "M";
+  }
+
+  if(v >= 1000){
+    return (v/1000).toFixed(2) + "K";
+  }
+
+  return v.toFixed(0);
+
+}
+
+
+/* =========================
+   切换5M / 1H
+   ========================= */
+
+function chg(x,i){
+
+  S[x].int = i;
+
+  render();
+
+}
+
+
+/* =========================
+   K线绘制
+   ========================= */
+
+function draw(x){
+
+  const canvas =
+    document.getElementById("cv-"+x);
+
+  if(!canvas) return;
+
+  const s = S[x];
+
+  const data =
+    s.int === "5m"
+    ? s.k5
+    : s.k1;
+
+  if(!data || data.length < 2){
+    return;
+  }
+
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+  const dpr =
+    window.devicePixelRatio || 1;
+
+  const w =
+    Math.max(1,rect.width);
+
+  const h =
+    Math.max(1,rect.height);
+
+  canvas.width = w*dpr;
+  canvas.height = h*dpr;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.setTransform(
+    dpr,0,0,dpr,0,0
+  );
+
+  ctx.clearRect(0,0,w,h);
+
+
+  const left = 8;
+  const right = 8;
+  const top = 10;
+  const bottom = 12;
+
+  const cw = w-left-right;
+  const ch = h-top-bottom;
+
+
+  const vals = [];
+
+  data.forEach(k => {
+
+    const hi = n(k[2]);
+    const lo = n(k[3]);
+
+    if(hi !== null) vals.push(hi);
+    if(lo !== null) vals.push(lo);
+
+  });
+
+
+  if(!vals.length) return;
+
+
+  let max =
+    Math.max(...vals);
+
+  let min =
+    Math.min(...vals);
+
+  let range =
+    max-min;
+
+  if(range === 0){
+    range = max * .001 || 1;
+    max += range;
+    min -= range;
+  }
+
+
+  function y(v){
+
+    return top +
+      (max-v)/range*ch;
+
+  }
+
+
+  const step =
+    cw/data.length;
+
+  const body =
+    Math.max(2,step*.52);
+
+
+  /* 网格 */
+
+  ctx.strokeStyle = "#edf0f3";
+  ctx.lineWidth = 1;
+
+  for(let i=0;i<4;i++){
+
+    const yy =
+      top + ch*i/3;
+
+    ctx.beginPath();
+    ctx.moveTo(left,yy);
+    ctx.lineTo(w-right,yy);
+    ctx.stroke();
+
+  }
+
+
+  /* K线 */
+
+  data.forEach((k,i)=>{
+
+    const o = n(k[1]);
+    const hi = n(k[2]);
+    const lo = n(k[3]);
+    const c = n(k[4]);
+
+    if(
+      o === null ||
+      hi === null ||
+      lo === null ||
+      c === null
+    ){
+      return;
+    }
+
+    const xx =
+      left + i*step + step/2;
+
+    const yo = y(o);
+    const yc = y(c);
+    const yh = y(hi);
+    const yl = y(lo);
+
+    const up = c >= o;
+
+    ctx.strokeStyle =
+      up ? "#16a34a" : "#dc2626";
+
+    ctx.fillStyle =
+      up ? "#16a34a" : "#dc2626";
+
+    ctx.lineWidth = 1;
+
+    /* 影线 */
+
+    ctx.beginPath();
+    ctx.moveTo(xx,yh);
+    ctx.lineTo(xx,yl);
+    ctx.stroke();
+
+
+    /* 实体 */
+
+    const bh =
+      Math.max(1,yc-yo);
+
+    const by =
+      Math.min(yo,yc);
+
+    ctx.fillRect(
+      xx-body/2,
+      by,
+      body,
+      bh
+    );
+
+  });
+
+
+  /* 当前价格线 */
+
+  if(s.price !== null){
+
+    const py = y(s.price);
+
+    ctx.strokeStyle = "#2563eb";
+    ctx.lineWidth = 1;
+
+    ctx.setLineDash([4,4]);
+
+    ctx.beginPath();
+    ctx.moveTo(left,py);
+    ctx.lineTo(w-right,py);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+  }
+
+}
+
+
+/* =========================
+   Render
+   ========================= */
+
+function render(){
+
+  marketOverview();
+
+  radar();
+
+  daily();
+
+
+  const box =
+    document.getElementById("cards");
+
+  if(!box) return;
+
+  box.innerHTML =
+    COINS.map(x => card(x)).join("");
+
+
+  requestAnimationFrame(()=>{
+
+    COINS.forEach(x=>{
+      draw(x);
+    });
+
+  });
+
+}
+
+
+/* =========================
+   WebSocket
+   每个币独立连接
+   ========================= */
+
+const WS = {};
+
+
+function connectOne(x){
+
+  try{
+
+    if(
+      WS[x] &&
+      (
+        WS[x].readyState === WebSocket.OPEN ||
+        WS[x].readyState === WebSocket.CONNECTING
+      )
+    ){
+      return;
+    }
+
+    const ws =
+      new WebSocket(
+        "wss://stream.binance.com:9443/ws/" +
+        x.toLowerCase() +
+        "@miniTicker"
+      );
+
+    WS[x] = ws;
+
+
+    ws.onopen = ()=>{
+
+      S[x].live = true;
+
+      updateConnection();
+
+      render();
+
+    };
+
+
+    ws.onmessage = e => {
+
+      try{
+
+        const d =
+          JSON.parse(e.data);
+
+        /*
+         * miniTicker:
+         * c = last price
+         */
+
+        const p = n(d.c);
+
+        if(p !== null){
+
+          S[x].price = p;
+
+          liveCandle(x);
+
+        }
+
+        S[x].live = true;
+
+        updateConnection();
+
+        render();
+
+      }catch(err){
+
+        console.log(
+          x,
+          "ws parse error",
+          err
+        );
+
+      }
+
+    };
+
+
+    ws.onerror = e => {
+
+      console.log(
+        x,
+        "WebSocket error"
+      );
+
+      S[x].live = false;
+
+      updateConnection();
+
+    };
+
+
+    ws.onclose = ()=>{
+
+      S[x].live = false;
+
+      updateConnection();
+
+      setTimeout(()=>{
+        connectOne(x);
+      },5000);
+
+    };
+
+
+  }catch(e){
+
+    console.log(
+      x,
+      "connect error",
+      e
+    );
+
+    S[x].live = false;
+
+    setTimeout(()=>{
+      connectOne(x);
+    },5000);
+
+  }
+
+}
+
+
+function connect(){
+
+  COINS.forEach(x=>{
+    connectOne(x);
+  });
+
+}
+
+
+/* =========================
+   连接状态
+   ========================= */
+
+function updateConnection(){
+
+  const dot =
+    document.getElementById("connDot");
+
+  const text =
+    document.getElementById("connText");
+
+  if(!dot || !text) return;
+
+
+  const count =
+    COINS.filter(x=>S[x].live).length;
+
+
+  if(count === COINS.length){
+
+    dot.className =
+      "conn-dot ok";
+
+    text.textContent =
+      "Binance 实时连接正常 · 7/7";
+
+  }else if(count > 0){
+
+    dot.className =
+      "conn-dot warn";
+
+    text.textContent =
+      "Binance 实时连接中 · " +
+      count + "/7";
+
+  }else{
+
+    dot.className =
+      "conn-dot";
+
+    text.textContent =
+      "正在连接 Binance...";
+
+  }
+
+}
+
+
+/* =========================
+   定时刷新
+   ========================= */
+
+async function refresh(){
+
+  await f24();
+
+  await allk();
+
+}
+
+
+/* =========================
+   页面进入后台 / 返回
+   ========================= */
+
+document.addEventListener(
+  "visibilitychange",
+  ()=>{
+
+    if(!document.hidden){
+
+      refresh();
+
+      COINS.forEach(x=>{
+        connectOne(x);
+      });
+
+    }
+
+  }
+);
+
+
+/* =========================
+   窗口变化
+   ========================= */
+
+window.addEventListener(
+  "resize",
+  ()=>{
+
+    requestAnimationFrame(()=>{
+
+      COINS.forEach(x=>{
+        draw(x);
+      });
+
+    });
+
+  }
+);
+
+
+/* =========================
+   定时器
+   ========================= */
+
+/*
+ * 24H数据：30秒
+ */
+setInterval(
+  f24,
+  30000
+);
+
+
+/*
+ * K线：60秒
+ */
+setInterval(
+  refresh,
+  60000
+);
+
+
+/* =========================
+   初始化
+   ========================= */
+
+async function init(){
+
+  /*
+   * 非常重要：
+   * 先启动WebSocket，
+   * 不等待K线REST。
+   */
+
+  render();
+
+  connect();
+
+  f24();
+
+  allk();
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
