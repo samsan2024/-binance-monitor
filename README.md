@@ -2,7 +2,7 @@
 
 Real-time 7-Coin Market Monitor
 
-▶️ Live Demo — 在线体验
+**▶️ [Live Demo — 在线体验](https://samsan2024.github.io/index.html/)**
 
 一个轻量级的加密货币行情监控工具，专注于快速发现市场异动。
 
