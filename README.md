@@ -1,5 +1,5 @@
 🚀 Crypto 7 Monitor
-
+▶️ Live Demo — 在线体验⁠
 Real-time 7-Coin Market Monitor
 
 一个轻量级的加密货币行情监控工具，专注于快速发现市场异动。
